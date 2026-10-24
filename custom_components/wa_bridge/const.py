@@ -1,6 +1,6 @@
 """Constants for the WhatsApp Integration integration."""
 
-DOMAIN = "whatsapp"
+DOMAIN = "wa_bridge"
 CONF_HOST = "host"
 CONF_PORT = "port"
 

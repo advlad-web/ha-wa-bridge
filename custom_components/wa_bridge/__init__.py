@@ -10,6 +10,7 @@ import base64
 import aiohttp
 import mimetypes
 import os
+from urllib.parse import urlparse
 
 import voluptuous as vol
 
@@ -17,6 +18,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.service import async_set_service_schema
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.components import persistent_notification
@@ -55,6 +57,8 @@ NOTIFY_CALL_SCHEMA = vol.Schema(
     }
 )
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the WhatsApp Integration component."""
     return True
@@ -89,10 +93,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
              # Generate QR Code Image
             try:
                 qr_data = msg['data']
-                img = qrcode.make(qr_data)
-                buffered = io.BytesIO()
-                img.save(buffered, format="PNG")
-                img_str = base64.b64encode(buffered.getvalue()).decode()
+                def _render_qr() -> str:
+                    img = qrcode.make(qr_data)
+                    buffered = io.BytesIO()
+                    img.save(buffered, format="PNG")
+                    return base64.b64encode(buffered.getvalue()).decode()
+
+                img_str = await hass.async_add_executor_job(_render_qr)
                 
                 # Create Persistent Notification
                 notification_id = f"whatsapp_qr_{entry.entry_id}"
@@ -117,7 +124,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_create_background_task(hass, bridge.start(bridge_event_callback), "whatsapp_bridge_connect")
 
     # Register Service
-    # Register Service
     async def get_media_data(hass, media_url, media_path):
         """Helper to retrieve media data from URL or path."""
         data = None
@@ -126,13 +132,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         if media_url:
             try:
-                async with aiohttp.ClientSession() as session:
+                session = async_get_clientsession(hass)
+                async with asyncio.timeout(60):
                     async with session.get(media_url) as response:
                         response.raise_for_status()
                         content = await response.read()
                         data = base64.b64encode(content).decode('utf-8')
-                        mimetype = response.headers.get('Content-Type') or mimetypes.guess_type(media_url)[0]
-                        filename = os.path.basename(media_url)
+                        url_path = urlparse(media_url).path
+                        mimetype = response.headers.get('Content-Type') or mimetypes.guess_type(url_path)[0]
+                        filename = os.path.basename(url_path)
             except Exception as e:
                 _LOGGER.error("Failed to fetch media from URL %s: %s", media_url, e)
                 return None
