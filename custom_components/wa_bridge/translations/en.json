@@ -7,10 +7,6 @@
         "data": {
           "host": "Bridge WebSocket URL"
         }
-      },
-      "scan": {
-        "title": "Scan QR Code",
-        "description": "Setup is almost complete!\n\nClick **Submit** to finish adding the integration.\n\nAfter you submit, check your **Notifications** (bell icon) for the QR code to link your WhatsApp account."
       }
     },
     "error": {
