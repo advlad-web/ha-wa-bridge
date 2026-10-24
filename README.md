@@ -3,6 +3,9 @@
 
 # Home Assistant WhatsApp Integration
 
+[![HACS](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz)
+[![hassfest](https://github.com/raulpetruta/ha-wa-bridge/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/raulpetruta/ha-wa-bridge/actions/workflows/hassfest.yaml)
+
 A custom integration to send and receive WhatsApp messages in Home Assistant naturally. It uses a local [Baileys](https://github.com/WhiskeySockets/Baileys) bridge running in Docker, without Chromium.
 
 ## Features
@@ -21,7 +24,7 @@ A custom integration to send and receive WhatsApp messages in Home Assistant nat
 
 ## Usage
 
-### Sending a Messsage
+### Sending a Message
 You can send messages to any number using the service:
 
 ```yaml
@@ -380,12 +383,12 @@ docker-compose up -d
 
 ### 2. Install the Integration
 
-#### Option A: HACS (Recommended)
-1.  Make sure [HACS](https://hacs.xyz/) is installed.
-2.  Go to HACS > Integrations > Top-right menu > **Custom repositories**.
-3.  Add `https://github.com/raulpetruta/ha-wa-bridge` as an **Integration**.
-4.  Click **Download**.
-5.  Restart Home Assistant.
+#### Option A: Marketplace / HACS (Recommended)
+1.  **Home Assistant 2026.11+**: open **Settings > Marketplace**, search for **WhatsApp Integration** and click **Download**.
+2.  **Older versions**: make sure [HACS](https://hacs.xyz/) is installed, then search for **WhatsApp Integration** under HACS > Integrations and click **Download**. If it is not listed yet, add `https://github.com/raulpetruta/ha-wa-bridge` as a custom repository of type **Integration**.
+3.  Restart Home Assistant.
+
+> The Marketplace and HACS install only the integration. The bridge (step 1) is a separate service that you run yourself, and the integration does nothing without it.
 
 #### Option B: Manual Installation
 1.  Copy the `custom_components/whatsapp` folder to your Home Assistant `config/custom_components/` directory.
