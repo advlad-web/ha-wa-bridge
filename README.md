@@ -9,16 +9,16 @@
 A custom integration to send and receive WhatsApp messages in Home Assistant naturally. It uses a local [Baileys](https://github.com/WhiskeySockets/Baileys) bridge running in Docker, without Chromium.
 
 ## Features
-- **Send Messages**: Use the `whatsapp.send_message` service in HA.
+- **Send Messages**: Use the `wa_bridge.send_message` service in HA.
 - **Notify**: Use the standard `notify.whatsapp` service, or save a chat as a notify entity and call `notify.send_message`.
 - **Group Messaging**: Send messages to WhatsApp groups by name or by group ID.
-- **Mentions**: Tag people in a group message with a `mentions` list on `whatsapp.send_message`. A bare phone number is enough. The bridge adds `@number` when it is not already in the text.
+- **Mentions**: Tag people in a group message with a `mentions` list on `wa_bridge.send_message`. A bare phone number is enough. The bridge adds `@number` when it is not already in the text.
 - **Group ID Support**: Target groups by their stable ID instead of name — automations won't break when a group is renamed.
-- **Get Groups**: Retrieve all WhatsApp groups with their IDs using the `whatsapp.get_groups` service.
-- **Set Group Subject**: Dynamically update a group's name using the `whatsapp.set_group_subject` service — perfect for automating group names based on schedules or sensor values.
-- **Set Group Picture**: Update a group's picture using the `whatsapp.set_group_picture` service.
+- **Get Groups**: Retrieve all WhatsApp groups with their IDs using the `wa_bridge.get_groups` service.
+- **Set Group Subject**: Dynamically update a group's name using the `wa_bridge.set_group_subject` service — perfect for automating group names based on schedules or sensor values.
+- **Set Group Picture**: Update a group's picture using the `wa_bridge.set_group_picture` service.
 - **Receive Messages**: Trigger automations when messages arrive (including WhatsApp Community channels).
-- **Send Events**: Send WhatsApp calendar events with name, location, and time using the `whatsapp.send_event` service.
+- **Send Events**: Send WhatsApp calendar events with name, location, and time using the `wa_bridge.send_event` service.
 - **Receive Filtering**: Disable incoming messages entirely or restrict to specific groups to save resources.
 - **Easy Auth**: Scan a QR code in Home Assistant to link your account.
 
@@ -28,7 +28,7 @@ A custom integration to send and receive WhatsApp messages in Home Assistant nat
 You can send messages to any number using the service:
 
 ```yaml
-service: whatsapp.send_message
+service: wa_bridge.send_message
 data:
   number: "40741234567" # Country code + Number (no "+" symbol) 
   message: "Hello from Home Assistant! 🏠"
@@ -38,17 +38,17 @@ data:
 You can send messages to a group by its exact name:
 
 ```yaml
-service: whatsapp.send_message
+service: wa_bridge.send_message
 data:
   group: "Family Group" # Exact name of the group
   message: "Dinner is ready! 🍽️"
 ```
 
 ### Sending to a Group by ID
-You can send messages to a group using its stable ID. This is recommended for automations since the ID doesn't change when the group is renamed. Use the `whatsapp.get_groups` service to find group IDs; or check the add on logs while sending / receiving a message for a group to get the ID
+You can send messages to a group using its stable ID. This is recommended for automations since the ID doesn't change when the group is renamed. Use the `wa_bridge.get_groups` service to find group IDs; or check the add on logs while sending / receiving a message for a group to get the ID
 
 ```yaml
-service: whatsapp.send_message
+service: wa_bridge.send_message
 data:
   group_id: "120363012345678901" # Group ID (use get_groups to find this)
   message: "Dinner is ready! 🍽️"
@@ -58,7 +58,7 @@ data:
 `mentions` tags phone numbers in a group message. Use the country code and no `+`. A bare number, `number@c.us`, or `number@s.whatsapp.net` all work. If the message does not already contain `@number`, the bridge adds it so WhatsApp can highlight the person.
 
 ```yaml
-service: whatsapp.send_message
+service: wa_bridge.send_message
 data:
   group_id: "120363012345678901"
   message: "hello world"
@@ -106,13 +106,13 @@ data:
   title: "Home" # Optional. Sent as the first line.
 ```
 
-`whatsapp.send_message` is unchanged.
+`wa_bridge.send_message` is unchanged.
 
 ### Retrieving Group IDs
-Use the `whatsapp.get_groups` service to retrieve all your WhatsApp groups with their IDs. The results are fired as a `whatsapp_groups_received` event.
+Use the `wa_bridge.get_groups` service to retrieve all your WhatsApp groups with their IDs. The results are fired as a `whatsapp_groups_received` event.
 
 ```yaml
-service: whatsapp.get_groups
+service: wa_bridge.get_groups
 ```
 
 You can listen for the result with an automation:
@@ -132,21 +132,21 @@ action:
 ```
 
 ### Setting a Group Subject (Name)
-You can dynamically update a group's name using the `whatsapp.set_group_subject` service. This is useful for automating group names based on schedules or template sensors. Requires admin permissions in the group.
+You can dynamically update a group's name using the `wa_bridge.set_group_subject` service. This is useful for automating group names based on schedules or template sensors. Requires admin permissions in the group.
 
 ```yaml
-service: whatsapp.set_group_subject
+service: wa_bridge.set_group_subject
 data:
   group_id: "120363012345678901" # Group ID (use get_groups to find this)
   subject: "Weekly Meeting - Monday 7PM"
 ```
 
 ### Setting a Group Picture
-You can update a group's picture using the `whatsapp.set_group_picture` service. Supports both URL and local path. Requires admin permissions in the group.
+You can update a group's picture using the `wa_bridge.set_group_picture` service. Supports both URL and local path. Requires admin permissions in the group.
 
 #### Using a URL
 ```yaml
-service: whatsapp.set_group_picture
+service: wa_bridge.set_group_picture
 data:
   group_id: "120363012345678901" # Group ID (use get_groups to find this)
   media_url: "https://example.com/group-photo.jpg"
@@ -154,7 +154,7 @@ data:
 
 #### Using a Local File
 ```yaml
-service: whatsapp.set_group_picture
+service: wa_bridge.set_group_picture
 data:
   group_id: "120363012345678901" # Group ID (use get_groups to find this)
   media_path: "www/group-photo.jpg"
@@ -164,7 +164,7 @@ data:
 You can send messages to multiple targets using the service:
 
 ```yaml
-service: whatsapp.send_broadcast
+service: wa_bridge.send_broadcast
 data:
   message: "Hello everyone! This is a broadcast."
   targets:
@@ -173,10 +173,10 @@ data:
 ```
 
 ### Sending Polls
-You can send polls using the `whatsapp.send_poll` service:
+You can send polls using the `wa_bridge.send_poll` service:
 
 ```yaml
-service: whatsapp.send_poll
+service: wa_bridge.send_poll
 data:
   message: "What should we have for dinner?"
   options:
@@ -188,10 +188,10 @@ data:
 ```
 
 ### Sending Events
-You can send WhatsApp calendar events using the `whatsapp.send_event` service. Events include a name, start time, and optional description, location, end time, and call link.
+You can send WhatsApp calendar events using the `wa_bridge.send_event` service. Events include a name, start time, and optional description, location, end time, and call link.
 
 ```yaml
-service: whatsapp.send_event
+service: wa_bridge.send_event
 data:
   number: "40741234567" # OR group: "Group Name" OR group_id: "120363012345678901"
   name: "Weekly Team Meeting"
@@ -206,7 +206,7 @@ data:
 Only `name` and `start_time` are required:
 
 ```yaml
-service: whatsapp.send_event
+service: wa_bridge.send_event
 data:
   number: "40741234567"
   name: "Dentist Appointment"
@@ -239,7 +239,7 @@ You can send images or files using either a URL (`media_url`) or a local path (`
 
 #### Using a URL
 ```yaml
-service: whatsapp.send_message
+service: wa_bridge.send_message
 data:
   number: "40741234567"
   message: "Check this out!"
@@ -249,7 +249,7 @@ data:
 #### Using a Local File
 Ensure the path is accessible by Home Assistant (e.g., in `config/www`).
 ```yaml
-service: whatsapp.send_broadcast
+service: wa_bridge.send_broadcast
 data:
   targets: ["Family Group", "40741234567"]
   message: "Security Snapshot"
@@ -261,7 +261,7 @@ Trigger actions when a specific message is received:
 
 ```yaml
 trigger:
-  - platform: whatsapp
+  - platform: wa_bridge
     from_number: "40741234567"
     contains_text: "Turn on lights" # Optional
 action:
@@ -275,7 +275,7 @@ To trigger an automation from a group message, use `from_group` with the exact g
 
 ```yaml
 trigger:
-  - platform: whatsapp
+  - platform: wa_bridge
     from_group: "Family Group"
     contains_text: "Dinner" # Optional
 action:
@@ -289,7 +289,7 @@ For more stable automations, use `from_group_id` instead of `from_group`. The gr
 
 ```yaml
 trigger:
-  - platform: whatsapp
+  - platform: wa_bridge
     from_group_id: "120363012345678901"
     contains_text: "Dinner" # Optional
     equals_text: "Dinner ready" # Optional
@@ -304,7 +304,7 @@ WhatsApp Community channels are treated as groups internally. You can trigger au
 
 ```yaml
 trigger:
-  - platform: whatsapp
+  - platform: wa_bridge
     from_group: "Announcements" # Exact channel name
     contains_text: "update" # Optional
     equals_text: "update received" # Optional
@@ -318,7 +318,7 @@ For more stable automations, use `from_group_id` with the channel's numeric ID. 
 
 ```yaml
 trigger:
-  - platform: whatsapp
+  - platform: wa_bridge
     from_group_id: "120363428200052636" # Channel ID from the bridge logs
     contains_text: "update" # Optional
 action:
@@ -391,8 +391,20 @@ docker-compose up -d
 > The Marketplace and HACS install only the integration. The bridge (step 1) is a separate service that you run yourself, and the integration does nothing without it.
 
 #### Option B: Manual Installation
-1.  Copy the `custom_components/whatsapp` folder to your Home Assistant `config/custom_components/` directory.
+1.  Copy the `custom_components/wa_bridge` folder to your Home Assistant `config/custom_components/` directory.
 2.  Restart Home Assistant.
+
+### Upgrading from 2.x
+
+Version 3.0.0 renames the integration domain from `whatsapp` to `wa_bridge`, because `whatsapp` is already used by another integration in the HACS catalog. This is a breaking change:
+
+1. Remove the old **WhatsApp Integration** entry under **Settings → Devices & services**.
+2. Delete `custom_components/whatsapp` from your Home Assistant config folder (HACS does not remove it for you), then install this version and restart.
+3. Add **WhatsApp Bridge** again with the same bridge WebSocket URL. The bridge add-on or container needs no changes and stays linked to your WhatsApp account.
+4. Update your automations and scripts:
+   - Services: `whatsapp.send_message` (and the other `whatsapp.*` services) become `wa_bridge.*`.
+   - Triggers: `platform: whatsapp` becomes `platform: wa_bridge`, and device triggers need to be picked again.
+   - Unchanged: `notify.whatsapp`, the `whatsapp_*_received` events, and the bridge configuration.
 
 ## Configuration
 
@@ -436,7 +448,7 @@ If you are using the Home Assistant Add-on, you can configure the following opti
 
   ```yaml
   trigger:
-    - platform: whatsapp
+    - platform: wa_bridge
       from_group: "Photo Updates"
   action:
     - service: notify.persistent_notification

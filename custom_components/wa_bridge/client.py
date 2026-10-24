@@ -4,6 +4,7 @@ import logging
 import aiohttp
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ class WhatsAppBridge:
         while self._running:
             try:
                 if not self._session:
-                    self._session = aiohttp.ClientSession()
+                    self._session = async_get_clientsession(self.hass)
 
                 _LOGGER.info("Connecting to WhatsApp Bridge at %s", self.host)
                 async with self._session.ws_connect(self.host) as ws:
@@ -51,8 +52,6 @@ class WhatsAppBridge:
         self._running = False
         if self._ws:
             await self._ws.close()
-        if self._session:
-            await self._session.close()
 
     async def send_message(self, number: str | None, message: str, group_name: str | None = None, group_id: str | None = None, media: dict | None = None, mentions: list | None = None):
         """Send a message via the bridge."""

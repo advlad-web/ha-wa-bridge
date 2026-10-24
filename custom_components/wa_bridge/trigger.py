@@ -8,7 +8,7 @@ from .const import EVENT_MESSAGE_RECEIVED
 
 TRIGGER_SCHEMA = cv.TRIGGER_BASE_SCHEMA.extend(
     {
-        vol.Required(CONF_PLATFORM): "whatsapp",
+        vol.Required(CONF_PLATFORM): "wa_bridge",
         vol.Optional("from_number"): cv.string,
         vol.Optional("from_group"): cv.string,
         vol.Optional("from_group_id"): cv.string,
@@ -99,7 +99,7 @@ async def async_attach_trigger(
         await action(
             {
                 "trigger": {
-                    "platform": "whatsapp",
+                    "platform": "wa_bridge",
                     "id": config.get("id"),
                     "event": data,
                     "from_number": sender,
