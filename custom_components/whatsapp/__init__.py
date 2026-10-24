@@ -55,6 +55,8 @@ NOTIFY_CALL_SCHEMA = vol.Schema(
     }
 )
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the WhatsApp Integration component."""
     return True
